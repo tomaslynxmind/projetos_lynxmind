@@ -1,0 +1,50 @@
+{
+  "Entradas": [
+    {
+      "nome": "Pão de Alho",
+      "descricao": "Fatiado com manteiga e alho",
+      "preco": "€2.50"
+    },
+    {
+      "nome": "Sopa do Dia",
+      "descricao": "Feita com legumes frescos",
+      "preco": "€3.00"
+    }
+  ],
+  "Pratos Principais": [
+    {
+      "nome": "Bife à Portuguesa",
+      "descricao": "Com batatas fritas e ovo",
+      "preco": "€10.50"
+    },
+    {
+      "nome": "Bacalhau com Natas",
+      "descricao": "Tradicional receita portuguesa",
+      "preco": "€12.00"
+    }
+  ],
+  "Sobremesas": [
+    {
+      "nome": "Mousse de Chocolate",
+      "descricao": "Feita com chocolate negro",
+      "preco": "€3.50"
+    },
+    {
+      "nome": "Pastel de Nata",
+      "descricao": "Doce típico português",
+      "preco": "€1.50"
+    }
+  ],
+  "Bebidas": [
+    {
+      "nome": "Água",
+      "descricao": "Garrafa 0.5L",
+      "preco": "€1.00"
+    },
+    {
+      "nome": "Vinho da Casa",
+      "descricao": "Tinto ou branco",
+      "preco": "€4.00"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Reservas - Restaurante Delícia</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Reservas</h1>
+    <nav>
+      <a href="index.html">Início</a>
+      <a href="ementa.html">Ementa</a>
+      <a href="login.html">Login</a>
+      <a href="reservas.html">Reservas</a>
+      <a href="contacto.html">Contacto</a>
+      <button id="temaBtn">🌙</button>
+    </nav>
+  </header>
+  <main>
+    <form id="reservaForm">
+      <label>Nome:
+        <input type="text" required>
+      </label>
+      <label>Email:
+        <input type="email" required>
+      </label>
+      <label>Data:
+        <input type="date" required>
+      </label>
+      <label>Hora:
+        <input type="time" required>
+      </label>
+      <label>Nº de Pessoas:
+        <input type="number" required min="1">
+      </label>
+      <button type="submit">Reservar</button>
+      <p id="reservaStatus"></p>
+    </form>
+  </main>
+  <footer>
+    <p>&copy; 2025 Restaurante Delícia</p>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>

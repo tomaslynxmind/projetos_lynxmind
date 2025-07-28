@@ -1,0 +1,62 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f8f8f8;
+  color: #333;
+}
+
+header {
+  background: #2e7d32;
+  color: white;
+  padding: 1em;
+  text-align: center;
+}
+
+nav a {
+  margin: 0 10px;
+  color: white;
+  text-decoration: none;
+}
+
+main {
+  padding: 2em;
+}
+
+.banner {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-top: 1em;
+}
+
+form {
+  max-width: 300px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+form label {
+  margin-bottom: 1em;
+}
+
+button {
+  padding: 0.5em;
+  background: #388e3c;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+#ementaContainer h2 {
+  margin-top: 1.5em;
+  color: #2e7d32;
+}
+
+.card {
+  background: white;
+  padding: 1em;
+  margin: 1em 0;
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
