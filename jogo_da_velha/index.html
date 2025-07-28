@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <title>Jogo da Velha com IA 🤖</title>
+  <style>
+    :root {
+      --bg-light: #f5f5f5;
+      --bg-dark: #1e1e1e;
+      --cell-light: #ffffff;
+      --cell-dark: #333333;
+      --text-light: #000;
+      --text-dark: #fff;
+      --primary: #4CAF50;
+      --highlight: #ffeb3b;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-light);
+      transition: background 0.3s, color 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    body.dark {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    #config {
+      margin-bottom: 20px;
+    }
+
+    select, button {
+      font-size: 1rem;
+      padding: 8px 12px;
+      margin: 5px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+    }
+
+    #tabuleiro {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 10px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .celula {
+      background: var(--cell-light);
+      font-size: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    body.dark .celula {
+      background: var(--cell-dark);
+    }
+
+    .celula:hover {
+      transform: scale(1.05);
+      background: var(--highlight);
+    }
+
+    #mensagem {
+      font-size: 1.3rem;
+      margin-top: 15px;
+      min-height: 40px;
+    }
+
+    .botoes {
+      margin-top: 15px;
+    }
+
+    .botoes button {
+      background: var(--primary);
+      color: white;
+      font-weight: bold;
+    }
+
+    #modo-btn {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background: #888;
+      color: white;
+    }
+
+    @media (max-width: 500px) {
+      #tabuleiro {
+        grid-template-columns: repeat(3, 80px);
+        grid-template-rows: repeat(3, 80px);
+      }
+      .celula {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Jogo da Velha 🤖</h1>
+
+  <div id="config">
+    <label>Escolhe teu símbolo:</label>
+    <select id="simbolo">
+      <option value="X">X</option>
+      <option value="O">O</option>
+    </select>
+    <button onclick="iniciarJogo()">Começar</button>
+  </div>
+
+  <div id="tabuleiro"></div>
+  <div id="mensagem"></div>
+  <div class="botoes">
+    <button onclick="iniciarJogo()">🔁 Reiniciar</button>
+  </div>
+
+  <button id="modo-btn" onclick="alternarModo()">🌙/☀️</button>
+
+  <audio id="som-clique" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_92f128818d.mp3?filename=click-124467.mp3"></audio>
+  <audio id="som-vitoria" src="https://cdn.pixabay.com/download/audio/2022/03/02/audio_840b91f67b.mp3?filename=success-1-6297.mp3"></audio>
+  <audio id="som-empate" src="https://cdn.pixabay.com/download/audio/2021/10/06/audio_10b702b31a.mp3?filename=negative_beeps-6008.mp3"></audio>
+
+  <script>
+    let jogador = "X";
+    let computador = "O";
+    let tabuleiro = Array(9).fill("");
+    let fimDeJogo = false;
+
+    const combinacoes = [
+      [0,1,2],[3,4,5],[6,7,8],
+      [0,3,6],[1,4,7],[2,5,8],
+      [0,4,8],[2,4,6]
+    ];
+
+    function alternarModo() {
+      document.body.classList.toggle("dark");
+    }
+
+    function iniciarJogo() {
+      jogador = document.getElementById("simbolo").value;
+      computador = jogador === "X" ? "O" : "X";
+      tabuleiro = Array(9).fill("");
+      fimDeJogo = false;
+      document.getElementById("mensagem").textContent = "";
+      desenharTabuleiro();
+
+      if (Math.random() < 0.5) {
+        document.getElementById("mensagem").textContent = "Computador começa!";
+        setTimeout(() => {
+          let jogada = melhorJogada(tabuleiro);
+          tabuleiro[jogada] = computador;
+          desenharTabuleiro();
+        }, 400);
+      } else {
+        document.getElementById("mensagem").textContent = "Tua vez!";
+      }
+    }
+
+    function desenharTabuleiro() {
+      const tab = document.getElementById("tabuleiro");
+      tab.innerHTML = "";
+      tabuleiro.forEach((valor, i) => {
+        const celula = document.createElement("div");
+        celula.className = "celula";
+        celula.textContent = valor;
+        celula.onclick = () => jogadaJogador(i);
+        tab.appendChild(celula);
+      });
+    }
+
+    function jogadaJogador(i) {
+      if (tabuleiro[i] !== "" || fimDeJogo) return;
+      tabuleiro[i] = jogador;
+      tocarSom("som-clique");
+      desenharTabuleiro();
+      if (verificarFim(jogador)) return;
+
+      setTimeout(() => {
+        let jogada = melhorJogada(tabuleiro);
+        tabuleiro[jogada] = computador;
+        desenharTabuleiro();
+        verificarFim(computador);
+      }, 400);
+    }
+
+    function verificarFim(simbolo) {
+      if (vitoria(tabuleiro, simbolo)) {
+        fimDeJogo = true;
+        document.getElementById("mensagem").textContent =
+          simbolo === jogador ? "🎉 Você venceu!" : "💻 O computador venceu!";
+        tocarSom(simbolo === jogador ? "som-vitoria" : "som-empate");
+        return true;
+      }
+
+      if (!tabuleiro.includes("")) {
+        fimDeJogo = true;
+        document.getElementById("mensagem").textContent = "😐 Empate!";
+        tocarSom("som-empate");
+        return true;
+      }
+
+      return false;
+    }
+
+    function vitoria(tab, simbolo) {
+      return combinacoes.some(comb =>
+        comb.every(i => tab[i] === simbolo)
+      );
+    }
+
+    function melhorJogada(tab) {
+      let melhor = -Infinity;
+      let jogada = -1;
+      for (let i = 0; i < 9; i++) {
+        if (tab[i] === "") {
+          tab[i] = computador;
+          let score = minimax(tab, 0, false);
+          tab[i] = "";
+          if (score > melhor) {
+            melhor = score;
+            jogada = i;
+          }
+        }
+      }
+      return jogada;
+    }
+
+    function minimax(tab, prof, maximizando) {
+      if (vitoria(tab, computador)) return 10 - prof;
+      if (vitoria(tab, jogador)) return prof - 10;
+      if (!tab.includes("")) return 0;
+
+      if (maximizando) {
+        let melhor = -Infinity;
+        for (let i = 0; i < 9; i++) {
+          if (tab[i] === "") {
+            tab[i] = computador;
+            let score = minimax(tab, prof + 1, false);
+            tab[i] = "";
+            melhor = Math.max(score, melhor);
+          }
+        }
+        return melhor;
+      } else {
+        let pior = Infinity;
+        for (let i = 0; i < 9; i++) {
+          if (tab[i] === "") {
+            tab[i] = jogador;
+            let score = minimax(tab, prof + 1, true);
+            tab[i] = "";
+            pior = Math.min(score, pior);
+          }
+        }
+        return pior;
+      }
+    }
+
+    function tocarSom(id) {
+      const som = document.getElementById(id);
+      som.currentTime = 0;
+      som.play();
+    }
+
+    iniciarJogo();
+  </script>
+</body>
+</html>
