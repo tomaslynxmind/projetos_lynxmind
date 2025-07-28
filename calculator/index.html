@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora Pro Max</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="claro">
+  <div class="calculadora">
+    <div class="topo">
+      <button id="alternar-tema">🌙</button>
+    </div>
+    <input type="text" id="display" readonly placeholder="0" />
+    <div class="botoes">
+      <button class="btn" data-valor="(">(</button>
+      <button class="btn" data-valor=")">)</button>
+      <button class="btn" data-valor="√">√</button>
+      <button class="btn" data-valor="C">C</button>
+
+      <button class="btn" data-valor="7">7</button>
+      <button class="btn" data-valor="8">8</button>
+      <button class="btn" data-valor="9">9</button>
+      <button class="btn" data-valor="/">÷</button>
+
+      <button class="btn" data-valor="4">4</button>
+      <button class="btn" data-valor="5">5</button>
+      <button class="btn" data-valor="6">6</button>
+      <button class="btn" data-valor="*">×</button>
+
+      <button class="btn" data-valor="1">1</button>
+      <button class="btn" data-valor="2">2</button>
+      <button class="btn" data-valor="3">3</button>
+      <button class="btn" data-valor="-">−</button>
+
+      <button class="btn" data-valor="0">0</button>
+      <button class="btn" data-valor=".">,</button>
+      <button class="btn" data-valor="=">=</button>
+      <button class="btn" data-valor="+">+</button>
+
+      <button class="btn" data-valor="^">x²</button>
+      <button class="btn" data-valor="%">%</button>
+      <button class="btn" data-valor="←">←</button>
+    </div>
+
+    <div class="historico" id="historico">
+      <h3>Histórico</h3>
+      <ul id="lista-historico"></ul>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
