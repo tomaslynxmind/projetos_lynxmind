@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Pedra, Papel, Tesoura</title>
+  <style>
+  * {
+    font-family: 'Segoe UI', sans-serif;
+    text-align: center;
+  }
+
+  body {
+    margin: 0;
+    padding: 40px;
+    background: linear-gradient(270deg, #74ebd5, #ACB6E5, #f5c6ec, #d5aaff);
+    background-size: 800% 800%;
+    animation: fundoAnimado 20s ease infinite;
+    color: #333;
+  }
+
+  @keyframes fundoAnimado {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(255,255,255,0.4);
+  }
+
+  .placar {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    background: rgba(255, 255, 255, 0.4);
+    padding: 10px 20px;
+    border-radius: 10px;
+    display: inline-block;
+  }
+
+  .botoes {
+    margin-bottom: 20px;
+  }
+
+  .botoes button {
+    font-size: 2rem;
+    margin: 10px;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.3s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+
+  .botoes button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+  }
+
+  .pedra { background-color: #ffc107; }
+  .papel { background-color: #4caf50; color: white; }
+  .tesoura { background-color: #2196f3; color: white; }
+
+  .computador-escolha {
+    font-size: 2rem;
+    margin-top: 20px;
+    height: 40px;
+  }
+
+  .resultado {
+    font-size: 1.4rem;
+    margin-top: 20px;
+    min-height: 60px;
+  }
+
+  .final {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: #000;
+    margin-top: 20px;
+  }
+
+  .reset {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    background: #fff;
+    border: 2px solid #888;
+    border-radius: 8px;
+    transition: background 0.3s;
+  }
+
+  .reset:hover {
+    background: #f0f0f0;
+  }
+  </style>
+</head>
+<body>
+  <h1>🪨📄✂️ Pedra, Papel, Tesoura</h1>
+
+  <div class="placar">
+    Jogador: <span id="pontos-jogador">0</span> |
+    Computador: <span id="pontos-computador">0</span>
+  </div>
+
+  <div class="botoes">
+    <button class="pedra" onclick="jogar('pedra')">🪨 Pedra</button>
+    <button class="papel" onclick="jogar('papel')">📄 Papel</button>
+    <button class="tesoura" onclick="jogar('tesoura')">✂️ Tesoura</button>
+  </div>
+
+  <div class="computador-escolha" id="computador-escolha">🤖 Computador está a escolher...</div>
+  <div class="resultado" id="resultado"></div>
+  <div class="final" id="final"></div>
+  <button class="reset" onclick="resetar()">🔄 Jogar Novamente</button>
+
+  <script>
+    let pontosJogador = 0;
+    let pontosComputador = 0;
+
+    const emoji = {
+      pedra: "🪨",
+      papel: "📄",
+      tesoura: "✂️"
+    };
+
+    function jogadaDoComputador() {
+      const opcoes = ["pedra", "papel", "tesoura"];
+      const escolha = Math.floor(Math.random() * 3);
+      return opcoes[escolha];
+    }
+
+    function jogar(jogadorEscolha) {
+      document.getElementById("resultado").textContent = "";
+      document.getElementById("computador-escolha").textContent = "🤖 Computador está a escolher...";
+
+      // Espera 500ms para mostrar a jogada
+      setTimeout(() => {
+        const computadorEscolha = jogadaDoComputador();
+        document.getElementById("computador-escolha").textContent =
+          `🤖 Computador escolheu: ${emoji[computadorEscolha]} ${computadorEscolha}`;
+
+        let resultado = "";
+
+        if (jogadorEscolha === computadorEscolha) {
+          resultado = `Empate! Ambos escolheram ${jogadorEscolha}.`;
+        } else if (
+          (jogadorEscolha === "pedra" && computadorEscolha === "tesoura") ||
+          (jogadorEscolha === "papel" && computadorEscolha === "pedra") ||
+          (jogadorEscolha === "tesoura" && computadorEscolha === "papel")
+        ) {
+          resultado = `🎉 Ganhaste! ${jogadorEscolha} vence ${computadorEscolha}.`;
+          pontosJogador++;
+        } else {
+          resultado = `😢 Perdeste! ${computadorEscolha} vence ${jogadorEscolha}.`;
+          pontosComputador++;
+        }
+
+        document.getElementById("resultado").textContent = resultado;
+        document.getElementById("pontos-jogador").textContent = pontosJogador;
+        document.getElementById("pontos-computador").textContent = pontosComputador;
+
+        if (pontosJogador === 5 || pontosComputador === 5) {
+          terminarJogo();
+        }
+      }, 500);
+    }
+
+    function terminarJogo() {
+      const final = document.getElementById("final");
+      if (pontosJogador > pontosComputador) {
+        final.textContent = "🏆 Parabéns! Ganhaste o jogo!";
+      } else {
+        final.textContent = "💻 O computador venceu o jogo!";
+      }
+
+      // Desativar os botões
+      document.querySelectorAll(".botoes button").forEach(btn => btn.disabled = true);
+    }
+
+    function resetar() {
+      pontosJogador = 0;
+      pontosComputador = 0;
+      document.getElementById("pontos-jogador").textContent = "0";
+      document.getElementById("pontos-computador").textContent = "0";
+      document.getElementById("resultado").textContent = "";
+      document.getElementById("computador-escolha").textContent = "🤖 Computador está a escolher...";
+      document.getElementById("final").textContent = "";
+      document.querySelectorAll(".botoes button").forEach(btn => btn.disabled = false);
+    }
+  </script>
+</body>
+</html>
