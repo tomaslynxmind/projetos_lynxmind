@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Jogo do Galo Liga Portuguesa</title>
+<style>
+  /* Reset básico */
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: #fff;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1 {
+    margin-bottom: 5px;
+    font-weight: 700;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+    font-size: 2.8rem;
+  }
+
+  p#jogadorAtual {
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+  }
+
+  table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  }
+
+  th, td {
+    padding: 25px 30px;
+    font-size: 22px;
+    cursor: pointer;
+    background-color: #0f2c54;
+    color: #cfe0fc;
+    border: 1px solid #1a4278;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    user-select: none;
+  }
+
+  th {
+    background: #1a4278;
+    font-weight: 600;
+    cursor: default;
+  }
+
+  td:hover:not(.filled) {
+    background-color: #1a62c4;
+    color: #fff;
+  }
+
+  td.filled {
+    cursor: default;
+    background-color: #74a9f7;
+    color: #0a1f3a;
+    font-weight: 700;
+    text-shadow: 1px 1px 3px rgba(255,255,255,0.4);
+  }
+
+  #pergunta {
+    background: rgba(0,0,0,0.3);
+    padding: 20px 25px;
+    margin-top: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    width: 100%;
+    max-width: 450px;
+  }
+
+  #pergunta p {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+  }
+
+  #respostaJogador {
+    font-size: 1.1rem;
+    padding: 10px 15px;
+    width: calc(100% - 110px);
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    margin-right: 10px;
+  }
+
+  #btnResponder {
+    background-color: #2563eb;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 10px 18px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.7);
+    transition: background-color 0.3s ease;
+  }
+
+  #btnResponder:hover {
+    background-color: #1e40af;
+  }
+
+  #mensagem {
+    margin-top: 18px;
+    font-weight: 600;
+    font-size: 1.25rem;
+    min-height: 28px;
+    text-shadow: 0 0 4px rgba(0,0,0,0.6);
+  }
+
+  #erros {
+    margin-top: 30px;
+    background: #7f1d1d;
+    border: 2px solid #b91c1c;
+    padding: 18px 22px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 600px;
+    text-align: left;
+  }
+
+  #erros h3 {
+    margin-top: 0;
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+  }
+
+  #erros ul {
+    list-style: inside disc;
+    padding-left: 0;
+  }
+
+  #erros ul li {
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+  }
+
+  @media (max-width: 480px) {
+    th, td {
+      padding: 15px 12px;
+      font-size: 16px;
+      width: 90px;
+      height: 60px;
+    }
+
+    #pergunta {
+      max-width: 100%;
+    }
+
+    #respostaJogador {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    #btnResponder {
+      width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h1>Jogo do Galo da Liga Portuguesa</h1>
+<p>Jogador atual: <span id="jogadorAtual">X</span></p>
+
+<table>
+  <thead>
+    <tr>
+      <th></th>
+      <th>Braga</th>
+      <th>Vitória SC</th>
+      <th>Marítimo</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Benfica</th>
+      <td data-linha="0" data-coluna="0">-</td>
+      <td data-linha="0" data-coluna="1">-</td>
+      <td data-linha="0" data-coluna="2">-</td>
+    </tr>
+    <tr>
+      <th>Porto</th>
+      <td data-linha="1" data-coluna="0">-</td>
+      <td data-linha="1" data-coluna="1">-</td>
+      <td data-linha="1" data-coluna="2">-</td>
+    </tr>
+    <tr>
+      <th>Sporting</th>
+      <td data-linha="2" data-coluna="0">-</td>
+      <td data-linha="2" data-coluna="1">-</td>
+      <td data-linha="2" data-coluna="2">-</td>
+    </tr>
+  </tbody>
+</table>
+
+<div id="pergunta" style="display:none;">
+  <p>Quem jogou em <span id="clubesEscolhidos"></span>?</p>
+  <input type="text" id="respostaJogador" autocomplete="off" />
+  <button id="btnResponder">Responder</button>
+</div>
+
+<div id="mensagem"></div>
+
+<div id="erros" style="display:none;">
+  <h3>Respostas erradas durante o jogo:</h3>
+  <ul id="listaErros"></ul>
+</div>
+
+<script>
+  const CLUBES_LINHAS = ["Benfica", "Porto", "Sporting"];
+  const CLUBES_COLUNAS = ["Braga", "Vitória SC", "Marítimo"];
+  const JOGADORES = {
+    "Benfica-Braga": ["Pizzi", "André Almeida", "Hassan", "João Teixeira"],
+    "Benfica-Vitória SC": ["Jota", "Rafa Silva", "Florentino Luís"],
+    "Benfica-Marítimo": ["Nuno Gomes", "Luisão"],
+    "Porto-Braga": ["Moussa Marega", "João Moutinho", "Alan", "Otávio"],
+    "Porto-Vitória SC": ["André André", "Ricardo Pereira", "Aboubakar"],
+    "Porto-Marítimo": ["Pepe", "Vítor Baía", "Diogo Valente"],
+    "Sporting-Braga": ["Paulinho", "Ricardo Esgaio", "Wilson Eduardo"],
+    "Sporting-Vitória SC": ["Rochinha", "Miguel Luís", "Pedro Mendes"],
+    "Sporting-Marítimo": ["Rui Patrício", "André Carrillo"]
+  };
+
+  let tabuleiro = [
+    ["-", "-", "-"],
+    ["-", "-", "-"],
+    ["-", "-", "-"]
+  ];
+
+  let jogadorAtual = "X";
+  let posicaoAtual = null;
+  let erros = [];
+
+  const tabela = document.querySelector("table tbody");
+  const jogadorAtualSpan = document.getElementById("jogadorAtual");
+  const perguntaDiv = document.getElementById("pergunta");
+  const clubesSpan = document.getElementById("clubesEscolhidos");
+  const respostaInput = document.getElementById("respostaJogador");
+  const btnResponder = document.getElementById("btnResponder");
+  const mensagemDiv = document.getElementById("mensagem");
+  const errosDiv = document.getElementById("erros");
+  const listaErros = document.getElementById("listaErros");
+
+  function atualizarTabuleiro() {
+    for(let i=0; i<3; i++) {
+      for(let j=0; j<3; j++) {
+        const td = tabela.querySelector(`td[data-linha="${i}"][data-coluna="${j}"]`);
+        td.textContent = tabuleiro[i][j];
+        if(tabuleiro[i][j] !== "-") {
+          td.classList.add("filled");
+        }
+      }
+    }
+  }
+
+  function trocarJogador() {
+    jogadorAtual = (jogadorAtual === "X") ? "O" : "X";
+    jogadorAtualSpan.textContent = jogadorAtual;
+  }
+
+  function verificarVitoria() {
+    const linhas = tabuleiro;
+    const colunas = [[],[],[]];
+    for(let i=0; i<3; i++) {
+      for(let j=0; j<3; j++) {
+        colunas[j].push(tabuleiro[i][j]);
+      }
+    }
+    const diagonais = [
+      [tabuleiro[0][0], tabuleiro[1][1], tabuleiro[2][2]],
+      [tabuleiro[0][2], tabuleiro[1][1], tabuleiro[2][0]]
+    ];
+
+    function checarLinha(arr) {
+      return arr.every(c => c === jogadorAtual);
+    }
+
+    for(let i=0; i<3; i++) {
+      if(checarLinha(linhas[i]) || checarLinha(colunas[i])) {
+        return true;
+      }
+    }
+
+    for(let d of diagonais) {
+      if(checarLinha(d)) return true;
+    }
+
+    return false;
+  }
+
+  function verificarEmpate() {
+    for(let linha of tabuleiro) {
+      for(let celula of linha) {
+        if(celula === "-") return false;
+      }
+    }
+    return true;
+  }
+
+  tabela.querySelectorAll("td").forEach(td => {
+    td.addEventListener("click", () => {
+      const i = Number(td.dataset.linha);
+      const j = Number(td.dataset.coluna);
+      if(tabuleiro[i][j] === "-") {
+        posicaoAtual = [i,j];
+        clubesSpan.textContent = CLUBES_LINHAS[i] + " vs " + CLUBES_COLUNAS[j];
+        perguntaDiv.style.display = "block";
+        respostaInput.value = "";
+        respostaInput.focus();
+        mensagemDiv.textContent = "";
+      }
+    });
+  });
+
+  btnResponder.addEventListener("click", () => {
+    if(!posicaoAtual) return;
+    const i = posicaoAtual[0];
+    const j = posicaoAtual[1];
+    const key = CLUBES_LINHAS[i] + "-" + CLUBES_COLUNAS[j];
+    const respostasValidas = JOGADORES[key].map(jogador => jogador.toLowerCase());
+    const resposta = respostaInput.value.trim().toLowerCase();
+
+    if(resposta === "") {
+      mensagemDiv.textContent = "Por favor, responde antes de enviar.";
+      return;
+    }
+
+    if(respostasValidas.includes(resposta)) {
+      tabuleiro[i][j] = jogadorAtual;
+      atualizarTabuleiro();
+      perguntaDiv.style.display = "none";
+
+      if(verificarVitoria()) {
+        mensagemDiv.textContent = `Jogador ${jogadorAtual} venceu! 🎉`;
+        tabela.querySelectorAll("td").forEach(td => td.style.pointerEvents = "none");
+        return;
+      }
+
+      if(verificarEmpate()) {
+        mensagemDiv.textContent = "Empate! 🥲";
+        return;
+      }
+
+      trocarJogador();
+      mensagemDiv.textContent = "";
+      posicaoAtual = null;
+    } else {
+      mensagemDiv.textContent = "Resposta errada! Tenta outra vez.";
+      erros.push(`${CLUBES_LINHAS[i]} vs ${CLUBES_COLUNAS[j]}: "${respostaInput.value.trim()}"`);
+      errosDiv.style.display = "block";
+      const li = document.createElement("li");
+      li.textContent = erros[erros.length-1];
+      listaErros.appendChild(li);
+    }
+  });
+
+  atualizarTabuleiro();
+</script>
+
+</body>
+</html>
