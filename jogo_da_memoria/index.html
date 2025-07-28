@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Jogo da Memória com Níveis</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #222;
+    color: #eee;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  h1 {
+    margin-bottom: 10px;
+  }
+  #level-select {
+    margin-bottom: 20px;
+    font-size: 16px;
+    padding: 6px 10px;
+    border-radius: 5px;
+    border: none;
+  }
+  #game {
+    display: grid;
+    grid-gap: 10px;
+    margin-bottom: 15px;
+  }
+  .card {
+    background: #444;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 2.5rem;
+    color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    transition: background 0.3s, color 0.3s;
+  }
+  .card.flipped {
+    background: #6c5ce7;
+    color: white;
+    cursor: default;
+  }
+  .card.matched {
+    background: #00b894;
+    color: white;
+    cursor: default;
+  }
+  #attempts {
+    font-size: 18px;
+  }
+  #reset-btn {
+    margin-top: 20px;
+    padding: 8px 16px;
+    background: #0984e3;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  #reset-btn:hover {
+    background: #74b9ff;
+  }
+</style>
+</head>
+<body>
+
+<h1>Jogo da Memória</h1>
+
+<label for="level-select">Escolha o nível:</label>
+<select id="level-select">
+  <option value="easy">Fácil (4x4)</option>
+  <option value="medium">Médio (6x6)</option>
+  <option value="hard">Difícil (8x8)</option>
+</select>
+
+<div id="game"></div>
+<div id="attempts">Tentativas: 0</div>
+<button id="reset-btn">Começar</button>
+
+<script>
+  const gameContainer = document.getElementById('game');
+  const attemptsDisplay = document.getElementById('attempts');
+  const resetBtn = document.getElementById('reset-btn');
+  const levelSelect = document.getElementById('level-select');
+
+  // Muitos símbolos pra poder usar níveis altos
+  const allSymbols = ['🍎','🍌','🍇','🍉','🍒','🥝','🍍','🍓',
+                      '🥥','🥭','🍑','🍐','🍋','🍊','🍏','🥑',
+                      '🌸','⭐','⚡','🔥','🍀','🌈','🎵','🎲',
+                      '🦋','🐞','🐝','🐢','🐠','🐬','🐳','🦄'];
+
+  let cards = [];
+  let flippedCards = [];
+  let matchedCount = 0;
+  let attempts = 0;
+  let lockBoard = false;
+  let gridSize = 4; // padrão 4x4
+
+  function shuffle(array) {
+    for (let i = array.length -1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i+1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+
+  function createCards() {
+    cards = [];
+    let pairsCount = (gridSize * gridSize) / 2;
+
+    // Pega os símbolos que vamos usar (sem repetir)
+    const symbols = allSymbols.slice(0, pairsCount);
+
+    symbols.forEach(symbol => {
+      cards.push({symbol, id: Math.random()});
+      cards.push({symbol, id: Math.random()});
+    });
+
+    shuffle(cards);
+  }
+
+  function renderGame() {
+    gameContainer.innerHTML = '';
+    // Ajusta grid pra ter colunas iguais ao gridSize
+    gameContainer.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+
+    // Ajusta tamanho das cartas dependendo do gridSize
+    const cardSize = gridSize === 4 ? 100 : gridSize === 6 ? 70 : 55;
+
+    cards.forEach((card, index) => {
+      const cardElement = document.createElement('div');
+      cardElement.classList.add('card');
+      cardElement.style.width = `${cardSize}px`;
+      cardElement.style.height = `${cardSize}px`;
+      cardElement.style.fontSize = `${cardSize * 0.6}px`;
+
+      cardElement.dataset.symbol = card.symbol;
+      cardElement.dataset.index = index;
+      cardElement.textContent = card.symbol;
+      cardElement.style.color = 'transparent'; // esconder símbolo no início
+      cardElement.addEventListener('click', onCardClick);
+      gameContainer.appendChild(cardElement);
+    });
+  }
+
+  function onCardClick(e) {
+    if(lockBoard) return;
+
+    const clickedCard = e.currentTarget;
+    if(clickedCard.classList.contains('flipped') || clickedCard.classList.contains('matched')) return;
+
+    flipCard(clickedCard);
+
+    flippedCards.push(clickedCard);
+
+    if(flippedCards.length === 2) {
+      attempts++;
+      attemptsDisplay.textContent = `Tentativas: ${attempts}`;
+      checkForMatch();
+    }
+  }
+
+  function flipCard(card) {
+    card.classList.add('flipped');
+    card.style.color = 'white';
+  }
+
+  function unflipCards() {
+    lockBoard = true;
+    setTimeout(() => {
+      flippedCards.forEach(card => {
+        card.classList.remove('flipped');
+        card.style.color = 'transparent';
+      });
+      flippedCards = [];
+      lockBoard = false;
+    }, 1000);
+  }
+
+  function checkForMatch() {
+    const [card1, card2] = flippedCards;
+    if(card1.dataset.symbol === card2.dataset.symbol) {
+      card1.classList.add('matched');
+      card2.classList.add('matched');
+      flippedCards = [];
+      matchedCount += 2;
+      if(matchedCount === cards.length) {
+        setTimeout(() => alert(`Parabéns! Você venceu em ${attempts} tentativas!`), 300);
+      }
+    } else {
+      unflipCards();
+    }
+  }
+
+  function resetGame() {
+    matchedCount = 0;
+    attempts = 0;
+    attemptsDisplay.textContent = `Tentativas: 0`;
+    flippedCards = [];
+    lockBoard = false;
+
+    // Define gridSize baseado no nível
+    const level = levelSelect.value;
+    if(level === 'easy') gridSize = 4;
+    else if(level === 'medium') gridSize = 6;
+    else gridSize = 8;
+
+    createCards();
+    renderGame();
+  }
+
+  resetBtn.addEventListener('click', resetGame);
+
+  // inicia o jogo com nível padrão
+  resetGame();
+
+</script>
+
+</body>
+</html>
